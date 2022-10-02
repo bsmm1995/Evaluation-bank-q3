@@ -30,8 +30,8 @@ public class ReportRepositoryImpl implements ReportRepository {
         Join<LoanEntity, PersonEntity> person = root.join("person", JoinType.INNER);
 
         query.multiselect(
-                root.get("names").alias("user"),
-                root.get("userType").alias("userType"),
+                person.get("names").alias("user"),
+                person.get("type").alias("userType"),
                 root.get("equipmentSeries").alias("equipmentSeries"),
                 root.get("loanDate").alias("loanDate"),
                 root.get("returnDate").alias("returnDate"));
