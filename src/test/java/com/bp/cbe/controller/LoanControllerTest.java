@@ -91,6 +91,25 @@ class LoanControllerTest {
                 .andExpect(jsonPath("$.message", is(String.format("The user with ID %d already has the maximum quota allowed and it is not possible to make another loan.", personDTO.getId()))));
     }
 
+    @Test
+    @DisplayName("Generate a loan: External can have only one loan")
+    void generateLoanExternalUser() throws Exception {
+        personDTO = createPerson(UserType.EXTERNAL);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons/" + personDTO.getId() + "/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loanDTO)))
+                .andExpect(status().isCreated());
+
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons/" + personDTO.getId() + "/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loanDTO)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message", is(String.format("The user with ID %d already has the maximum quota allowed and it is not possible to make another loan.", personDTO.getId()))));
+    }
+
     private PersonDTO createPerson(UserType userType) throws Exception {
         personDTO.setType(userType);
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders

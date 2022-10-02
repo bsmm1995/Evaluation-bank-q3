@@ -80,6 +80,6 @@ class PersonServiceImplTest {
     void personNotFound() {
         when(this.personRepositoryMock.findById(id)).thenReturn(Optional.empty());
         Throwable exception = assertThrows(NotFoundException.class, () -> personService.getById(id));
-        assertEquals("No se encontró el registro con ID " + id, exception.getMessage());
+        assertEquals("Record with ID " + id + " not found", exception.getMessage());
     }
 }

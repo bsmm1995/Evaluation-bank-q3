@@ -73,7 +73,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     private LoanEntity getEntityById(Long id) {
-        return loanRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el registro con ID " + id));
+        return loanRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Record with ID %d not found", id)));
     }
 
     private LoanEntity toEntity(LoanDTO data) {
@@ -113,7 +113,7 @@ public class LoanServiceImpl implements LoanService {
     private PersonEntity getPersonEntityById(Long id) {
         Optional<PersonEntity> optional = personRepository.findById(id);
         if (optional.isEmpty()) {
-            throw new NotFoundException("No se encontró la persona con ID " + id);
+            throw new NotFoundException(String.format("Person with ID %d was not found", id));
         }
         return optional.get();
     }

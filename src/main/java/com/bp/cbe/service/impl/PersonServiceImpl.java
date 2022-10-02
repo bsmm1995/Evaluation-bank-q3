@@ -74,7 +74,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private PersonEntity getEntityById(Long id) {
-        return personRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontró el registro con ID " + id));
+        return personRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Record with ID %d not found", id)));
     }
 
     private PersonEntity toEntity(PersonDTO data) {
