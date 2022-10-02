@@ -8,6 +8,7 @@ import com.bp.cbe.domain.enums.UserType;
 import com.bp.cbe.exceptions.LoanException;
 import com.bp.cbe.exceptions.NotFoundException;
 import com.bp.cbe.repository.LoanRepository;
+import com.bp.cbe.repository.PersonRepository;
 import com.bp.cbe.service.LoanService;
 import com.bp.cbe.service.PersonService;
 import com.bp.cbe.utils.Constants;
@@ -27,6 +28,7 @@ import java.util.List;
 public class LoanServiceImpl implements LoanService {
     private final LoanRepository loanRepository;
     private final PersonService personService;
+    private final PersonRepository personRepository;
 
     @Override
     public LoanDTO getById(Long id) {
@@ -43,7 +45,6 @@ public class LoanServiceImpl implements LoanService {
     public LoanDTO create(Long personId, LoanDTO data) {
         LoanEntity entity = this.toEntity(data);
         entity.setLoanDate(LocalDate.now());
-        entity.setPerson(new PersonEntity(personId));
 
         UserType userType = personService.getUserTypeById(personId);
         int numberLoans = personService.getNumberLoansById(personId);
@@ -54,6 +55,7 @@ public class LoanServiceImpl implements LoanService {
 
         this.validateDate(userType, entity);
         personService.updateStatus(personId, Status.ACTIVE);
+        entity.setPerson(new PersonEntity(personId));
         return this.toDto(loanRepository.save(entity));
     }
 
