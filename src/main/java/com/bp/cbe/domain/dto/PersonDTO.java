@@ -25,7 +25,7 @@ public class PersonDTO implements Serializable {
     Status status;
     List<LoanOutDTO> loans;
 
-    public PersonDTO(Long id, String names, UserType type) {
+    public PersonDTO(String names, UserType type) {
         this.id = id;
         this.names = names;
         this.type = type;

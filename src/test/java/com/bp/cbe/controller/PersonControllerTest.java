@@ -1,7 +1,6 @@
 package com.bp.cbe.controller;
 
 import com.bp.cbe.domain.dto.PersonDTO;
-import com.bp.cbe.domain.dto.error.ErrorResponse;
 import com.bp.cbe.domain.enums.Status;
 import com.bp.cbe.domain.enums.UserType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,32 +39,81 @@ class PersonControllerTest {
 
     @BeforeEach
     void setUp() {
-        dto = new PersonDTO(1L, "Bladimir", UserType.INTERNAL);
+        dto = new PersonDTO("Bladimir", UserType.INTERNAL);
     }
 
     @Test
-    @DisplayName("create a person")
+    @DisplayName("Create a person: It should have by default the status CREATED")
     void createPersonShouldHaveCreatedStatus() throws Exception {
-        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.post("/persons").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(dto))).andExpect(status().isCreated()).andExpect(jsonPath("$.id", is(greaterThan(0)))).andExpect(jsonPath("$.names").exists()).andReturn();
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .post("/persons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(greaterThan(0))))
+                .andExpect(jsonPath("$.names").exists())
+                .andReturn();
 
         PersonDTO result = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), PersonDTO.class);
 
         assertNotNull(result);
         assertEquals(Status.CREATED, result.getStatus());
 
-        mvc.perform(MockMvcRequestBuilders.get("/persons/" + result.getId()).accept(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.id").exists()).andExpect(jsonPath("$.names", is("Bladimir"))).andExpect(jsonPath("$.loans").isEmpty());
+        mvc.perform(MockMvcRequestBuilders
+                        .get("/persons/" + result.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.names", is("Bladimir")))
+                .andExpect(jsonPath("$.loans").isEmpty());
     }
 
     @Test
-    @DisplayName("should give an unsupported user type error")
-    void createPerson() throws Exception {
+    @DisplayName("Create a person: Should throw error user type does not exist")
+    void createPersonShouldErrorUserTypeNotExist() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"names\":\"Bladimir Minga\",\"type\":\"NONE\"}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message", is("User type does not exist")));
+    }
+
+    @Test
+    @DisplayName("Update a person: You should update only the typeUser and status.")
+    void updatePersonShouldUpdateTypeUserAndStatus() throws Exception {
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
-                .post("/persons").contentType(MediaType.APPLICATION_JSON)
-                .content("{\"names\":\"string\",\"type\":\"NONE\"}")).andExpect(status().is4xxClientError()).andReturn();
+                        .post("/persons")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        ErrorResponse result = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ErrorResponse.class);
+        PersonDTO personSaved = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), PersonDTO.class);
 
-        assertNotNull(result);
-        assertEquals("User type does not exist", result.getMessage());
+        PersonDTO personToUpdate = new PersonDTO("New name", UserType.GUEST);
+        personToUpdate.setId(99999L);
+        personToUpdate.setStatus(Status.ACTIVE);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .put("/persons/" + personSaved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(personToUpdate)))
+                .andExpect(status().isOk());
+
+        mvcResult = mvc.perform(MockMvcRequestBuilders
+                        .get("/persons/" + personSaved.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        PersonDTO result = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), PersonDTO.class);
+
+        assertEquals(personSaved.getId(), result.getId());
+        assertEquals(personSaved.getNames(), result.getNames());
+        assertEquals(personSaved.getId(), result.getId());
+        assertEquals(Status.ACTIVE, result.getStatus());
+        assertEquals(UserType.GUEST, result.getType());
     }
 }
