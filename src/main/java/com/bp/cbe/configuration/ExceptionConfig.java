@@ -26,12 +26,12 @@ public class ExceptionConfig {
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<ErrorResponse> invalidFormatException(InvalidFormatException e, HttpServletRequest req) {
         log.error(e.getLocalizedMessage());
-        return new ResponseEntity<>(new ErrorResponse("User type does not exist", req.getRequestURI(), HttpStatus.BAD_REQUEST), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ErrorResponse("User type does not exist", req.getRequestURI(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(LoanException.class)
     public ResponseEntity<ErrorResponse> loanException(LoanException e, HttpServletRequest req) {
         log.error(e.getLocalizedMessage());
-        return new ResponseEntity<>(new ErrorResponse(e.getLocalizedMessage(), req.getRequestURI(), HttpStatus.BAD_REQUEST), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ErrorResponse(e.getLocalizedMessage(), req.getRequestURI(), HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
 }

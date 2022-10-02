@@ -47,7 +47,7 @@ class LoanControllerTest {
     @Test
     @DisplayName("Generate a loan: Should change person status")
     void generateLoan() throws Exception {
-        personDTO = createPerson();
+        personDTO = createPerson(UserType.INTERNAL);
 
         mvc.perform(MockMvcRequestBuilders
                         .post("/persons/" + personDTO.getId() + "/loans")
@@ -72,7 +72,27 @@ class LoanControllerTest {
         assertEquals(Status.ACTIVE, result.getStatus());
     }
 
-    private PersonDTO createPerson() throws Exception {
+    @Test
+    @DisplayName("Generate a loan: Guest can have only one loan")
+    void generateLoanGuestUser() throws Exception {
+        personDTO = createPerson(UserType.GUEST);
+
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons/" + personDTO.getId() + "/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loanDTO)))
+                .andExpect(status().isCreated());
+
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons/" + personDTO.getId() + "/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loanDTO)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message", is(String.format("The user with ID %d already has the maximum quota allowed and it is not possible to make another loan.", personDTO.getId()))));
+    }
+
+    private PersonDTO createPerson(UserType userType) throws Exception {
+        personDTO.setType(userType);
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
                         .post("/persons")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,5 +102,4 @@ class LoanControllerTest {
 
         return objectMapper.readValue(mvcResult.getResponse().getContentAsString(), PersonDTO.class);
     }
-
 }

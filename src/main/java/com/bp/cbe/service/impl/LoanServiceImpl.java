@@ -10,7 +10,6 @@ import com.bp.cbe.exceptions.NotFoundException;
 import com.bp.cbe.repository.LoanRepository;
 import com.bp.cbe.repository.PersonRepository;
 import com.bp.cbe.service.LoanService;
-import com.bp.cbe.service.PersonService;
 import com.bp.cbe.utils.Constants;
 import com.bp.cbe.utils.Date;
 import com.bp.cbe.utils.Mapper;
@@ -21,13 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class LoanServiceImpl implements LoanService {
     private final LoanRepository loanRepository;
-    private final PersonService personService;
+
     private final PersonRepository personRepository;
 
     @Override
@@ -46,16 +46,16 @@ public class LoanServiceImpl implements LoanService {
         LoanEntity entity = this.toEntity(data);
         entity.setLoanDate(LocalDate.now());
 
-        UserType userType = personService.getUserTypeById(personId);
-        int numberLoans = personService.getNumberLoansById(personId);
+        PersonEntity personEntity = getPersonEntityById(personId);
 
-        if (((userType == UserType.EXTERNAL || userType == UserType.GUEST) && numberLoans >= 1) || (userType == UserType.INTERNAL && numberLoans >= 2)) {
+        if (((personEntity.getType() == UserType.EXTERNAL || personEntity.getType() == UserType.GUEST) && !personEntity.getLoans().isEmpty())
+                || (personEntity.getType() == UserType.INTERNAL && personEntity.getLoans().size() >= 2)) {
             throwLoanException(personId);
         }
 
-        this.validateDate(userType, entity);
-        personService.updateStatus(personId, Status.ACTIVE);
-        entity.setPerson(new PersonEntity(personId));
+        this.validateDate(personEntity.getType(), entity);
+        personEntity.setStatus(Status.ACTIVE);
+        entity.setPerson(personEntity);
         return this.toDto(loanRepository.save(entity));
     }
 
@@ -108,5 +108,13 @@ public class LoanServiceImpl implements LoanService {
         } else if (returnDate != entity.getReturnDate()) {
             throw new LoanException("Error in return date for user type " + userType);
         }
+    }
+
+    private PersonEntity getPersonEntityById(Long id) {
+        Optional<PersonEntity> optional = personRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new NotFoundException("No se encontró la persona con ID " + id);
+        }
+        return optional.get();
     }
 }
