@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -134,6 +136,20 @@ class LoanControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message", is(String.format("The user with ID %d already has the maximum quota allowed and it is not possible to make another loan.", personDTO.getId()))));
     }
+
+    @Test
+    @DisplayName("Generate a loan: Should return incorrect date")
+    void generateLoanInvalidDate() throws Exception {
+        personDTO = createPerson(UserType.INTERNAL);
+        loanDTO.setReturnDate(LocalDate.now().plusDays(400));
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/persons/" + personDTO.getId() + "/loans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loanDTO)))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message", is("Error in return date for user type " + personDTO.getType())));
+    }
+
 
     private PersonDTO createPerson(UserType userType) throws Exception {
         personDTO.setType(userType);
