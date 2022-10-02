@@ -150,7 +150,6 @@ class LoanControllerTest {
                 .andExpect(jsonPath("$.message", is("Error in return date for user type " + personDTO.getType())));
     }
 
-
     private PersonDTO createPerson(UserType userType) throws Exception {
         personDTO.setType(userType);
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders
