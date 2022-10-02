@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PersonEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "GEN")
     @Column(nullable = false, unique = true)
     Long id;
 

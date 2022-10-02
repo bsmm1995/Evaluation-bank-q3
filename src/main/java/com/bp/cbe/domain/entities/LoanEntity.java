@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Entity(name = "LOAN")
 public class LoanEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.TABLE, generator = "GEN")
     @Column(nullable = false, unique = true)
     Long id;
 
