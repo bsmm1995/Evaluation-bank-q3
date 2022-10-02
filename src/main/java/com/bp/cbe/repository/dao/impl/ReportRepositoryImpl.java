@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -35,11 +36,17 @@ public class ReportRepositoryImpl implements ReportRepository {
                 root.get("loanDate").alias("loanDate"),
                 root.get("returnDate").alias("returnDate"));
 
-        query.where(
-                criteriaBuilder.and(
-                        criteriaBuilder.equal(person.get("id"), personId),
-                        criteriaBuilder.equal(root.get("loanDate"), 0.75),
-                        criteriaBuilder.equal(root.get("returnDate"), 0.75)));
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(criteriaBuilder.equal(person.get("id"), personId));
+        if (loanDate != null) {
+            predicates.add(criteriaBuilder.equal(root.get("loanDate"), loanDate));
+        }
+
+        if (returnDate != null) {
+            predicates.add(criteriaBuilder.equal(root.get("returnDate"), returnDate));
+        }
+
+        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
 
         query.orderBy(criteriaBuilder.desc(root.get("loanDate")));
 
