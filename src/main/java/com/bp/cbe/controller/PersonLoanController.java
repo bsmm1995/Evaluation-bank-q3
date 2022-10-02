@@ -3,6 +3,7 @@ package com.bp.cbe.controller;
 import com.bp.cbe.domain.dto.LoanDTO;
 import com.bp.cbe.service.LoanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,6 @@ public class PersonLoanController {
 
     @PostMapping("/{person-id}/loans")
     public ResponseEntity<LoanDTO> create(@PathVariable(name = "person-id") Long personId, @RequestBody @Valid LoanDTO data) {
-        return ResponseEntity.ok(loanService.create(personId, data));
+        return new ResponseEntity<>(loanService.create(personId, data), HttpStatus.CREATED);
     }
 }

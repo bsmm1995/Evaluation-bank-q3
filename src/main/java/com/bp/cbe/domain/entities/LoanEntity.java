@@ -29,6 +29,6 @@ public class LoanEntity implements Serializable {
     LocalDate returnDate;
 
     @ManyToOne
-    @JoinColumn(name = "PERSON_ID", nullable = false, updatable = false)
+    @JoinColumn(name = "PERSON_ID", nullable = false, insertable = false, updatable = false)
     private PersonEntity person;
 }

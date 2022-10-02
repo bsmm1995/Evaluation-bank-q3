@@ -2,6 +2,7 @@ package com.bp.cbe.service.impl;
 
 import com.bp.cbe.domain.dto.LoanDTO;
 import com.bp.cbe.domain.entities.LoanEntity;
+import com.bp.cbe.domain.entities.PersonEntity;
 import com.bp.cbe.domain.enums.Status;
 import com.bp.cbe.domain.enums.UserType;
 import com.bp.cbe.exceptions.LoanException;
@@ -42,6 +43,7 @@ public class LoanServiceImpl implements LoanService {
     public LoanDTO create(Long personId, LoanDTO data) {
         LoanEntity entity = this.toEntity(data);
         entity.setLoanDate(LocalDate.now());
+        entity.setPerson(new PersonEntity(personId));
 
         UserType userType = personService.getUserTypeById(personId);
         int numberLoans = personService.getNumberLoansById(personId);

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -23,7 +22,6 @@ public class LoanDTO implements Serializable {
 
     LocalDate loanDate;
 
-    @NotNull
     LocalDate returnDate;
     PersonOutDTO person;
 }
