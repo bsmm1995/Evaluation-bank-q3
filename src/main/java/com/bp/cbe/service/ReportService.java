@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ReportService {
     List<ReportDTO> getReport(Long personId, LocalDate loanDate, LocalDate returnDate);
+
+    List<ReportDTO> getReportByPersonId(Long personId);
 }

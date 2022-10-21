@@ -22,4 +22,9 @@ public class ReportController {
                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate returnDate) {
         return ResponseEntity.ok(reportService.getReport(personId, loanDate, returnDate));
     }
+
+    @GetMapping("/{person-id}")
+    public ResponseEntity<List<ReportDTO>> getReportByPersonId(@PathVariable(name = "person-id") Long personId) {
+        return ResponseEntity.ok(reportService.getReportByPersonId(personId));
+    }
 }
