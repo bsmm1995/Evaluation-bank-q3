@@ -1,7 +1,7 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.5'
-	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
 }
 
 group = 'com.bp.cbe'
@@ -9,12 +9,12 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.5'
     implementation 'org.modelmapper:modelmapper:3.1.0'
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
@@ -23,11 +23,11 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
 
-	runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
 
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
